@@ -1,4 +1,4 @@
-name: "Release & Changelog Automation"
+name: "Release & Changelog"
 
 on:
   workflow_run:
