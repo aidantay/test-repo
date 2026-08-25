@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/aidantay/test-repo/compare/v0.1.5...v0.1.6) (2026-08-25)
+
+
+### Bug Fixes
+
+* update ([dcafe07](https://github.com/aidantay/test-repo/commit/dcafe07c28a2b7f9a022525a0ea2aba99d3296f6))
+
 ## [0.1.5](https://github.com/aidantay/test-repo/compare/v0.1.4...v0.1.5) (2026-08-25)
 
 
