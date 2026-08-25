@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/aidantay/test-repo/compare/v0.1.2...v0.1.3) (2026-08-25)
+
+
+### Bug Fixes
+
+* new ([39c4c4d](https://github.com/aidantay/test-repo/commit/39c4c4d949990df96fc39f959fd363c47a44ccd9))
+
 ## [0.1.2](https://github.com/aidantay/test-repo/compare/v0.1.1...v0.1.2) (2026-08-25)
 
 
