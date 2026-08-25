@@ -11,7 +11,7 @@ MAKEFLAGS += --no-print-directory
 # Define a default registry/username, but allow overriding it via environment or command line
 REGISTRY ?=
 IMAGE_NAME := test-repo
-VERSION := 0.0.0 # x-release-please-version
+VERSION := 0.1.0 # x-release-please-version
 
 # Automatically discover stages
 STAGES := $(filter-out decode, $(notdir $(wildcard stages/*)))
