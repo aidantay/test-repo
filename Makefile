@@ -12,6 +12,7 @@ MAKEFLAGS += --no-print-directory
 REGISTRY ?=
 IMAGE_NAME := test-repo
 VERSION := 0.1.5 # x-release-please-version
+IMAGE_TAG ?= $(shell echo "$(VERSION)" | grep -E '^v?[0-9]' >/dev/null && (echo "$(VERSION)" | grep -q '^v' && echo "$(VERSION)" || echo "v$(VERSION)") || echo "$(VERSION)")
 
 # Automatically discover stages
 STAGES := $(filter-out decode, $(notdir $(wildcard stages/*)))
@@ -51,6 +52,11 @@ clean-all: clean-venv-all clean-docs-all clean-exe-all
 	@find . -type d -name ".ruff_cache" -exec rm -rf {} +
 	@find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	@find . -type f -name "uv.lock" -exec rm -rf {} +
+
+setup-dev: ## Setup local environment and git hooks
+	@uv sync
+	@uv tool install pre-commit
+	@pre-commit install --hook-type commit-msg
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #     VENV TARGETS
@@ -169,7 +175,7 @@ publish-image-all: clean-image-all build-image-all push-image-all
 clean-image: ## Clean a single stage container image (e.g., make clean-image stage=01-windows)
 	$(call CHECK_REGISTRY)
 	$(call CHECK_STAGE)
-	@docker rmi $(REGISTRY)/$(IMAGE_NAME)-$(stage):v$(VERSION) || true
+	@docker rmi $(REGISTRY)/$(IMAGE_NAME)-$(stage):$(VERSION) || true
 
 clean-image-all: ## Clean all container images
 	$(call CHECK_REGISTRY)
@@ -183,7 +189,7 @@ build-image: ## Build a single stage container image (e.g., make build-image sta
 	$(call CHECK_STAGE)
 	@docker build \
 		-f stages/$(stage)/Dockerfile \
-		-t $(REGISTRY)/$(IMAGE_NAME)-$(stage):v$(VERSION) \
+		-t $(REGISTRY)/$(IMAGE_NAME)-$(stage):$(VERSION) \
 		-q \
 		.
 
@@ -197,7 +203,7 @@ build-image-all: ## Build all container images
 push-image: ## Push a single stage to Docker Hub (e.g., make push-image stage=01-windows)
 	$(call CHECK_REGISTRY)
 	$(call CHECK_STAGE)
-	@docker push $(REGISTRY)/$(IMAGE_NAME)-$(stage):v$(VERSION)
+	@docker push $(REGISTRY)/$(IMAGE_NAME)-$(stage):$(VERSION)
 
 push-image-all: ## Push all container images to Docker Hub
 	$(call CHECK_REGISTRY)
