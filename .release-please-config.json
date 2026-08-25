@@ -3,7 +3,7 @@
   "packages": {
     ".": {
       "release-type": "python",
-      "pull-request-title-pattern": "chore(main): release ${version}",
+      "pull-request-title-pattern": "chore(main): release ${version} [skip ci]",
       "changelog-path": "docs/CHANGELOG.md",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
