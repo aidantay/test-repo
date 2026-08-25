@@ -1,0 +1,5 @@
+[project]
+site_name = "Shared Libraries"
+nav = [
+    { "API Reference" = "api.md" }
+]

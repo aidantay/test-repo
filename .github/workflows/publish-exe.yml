@@ -1,0 +1,78 @@
+name: "Publish Cross-Platform Executables to GitHub Release"
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Release tag name"
+        required: false
+        type: string
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: "Install uv"
+        uses: astral-sh/setup-uv@v10.0.0
+        with:
+          enable-cache: true
+          python-version: "3.13"
+
+      - name: "Build stage binary executables"
+        shell: bash
+        run: |
+          make build-exe-all
+
+      - name: "Upload artifacts"
+        uses: actions/upload-artifact@v7
+        with:
+          name: truetrace-${{ runner.os }}-x64
+          path: dist/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: "Download all artifacts"
+        uses: actions/download-artifact@v8
+        with:
+          path: ./release-dist
+
+      - name: "Compress release assets"
+        run: |
+          cd release-dist
+          # Compress Linux binaries into single tar.gz
+          if [ -d "truetrace-Linux-x64" ]; then
+            tar -czvf truetrace-linux-x64.tar.gz -C truetrace-Linux-x64 .
+          fi
+          # Compress Windows binaries into single zip
+          if [ -d "truetrace-Windows-x64" ]; then
+            zip -j truetrace-windows-x64.zip truetrace-Windows-x64/*
+          fi
+          # Compress macOS binaries into single zip
+          if [ -d "truetrace-macOS-x64" ]; then
+            zip -j truetrace-macos-arm64.zip truetrace-macOS-x64/*
+          fi
+
+      - name: "Push assets to GitHub Release"
+        uses: softprops/action-gh-release@v3
+        with:
+          files: ./release-dist/**/truetrace-*
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: Release ${{ inputs.tag || github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

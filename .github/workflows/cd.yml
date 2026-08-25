@@ -1,0 +1,34 @@
+name: "Continuous Deployment"
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-docs:
+    uses: ./.github/workflows/deploy-docs.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets: inherit
+
+  publish-exe:
+    uses: ./.github/workflows/publish-exe.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets: inherit
+
+  publish-image:
+    uses: ./.github/workflows/publish-image.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets: inherit

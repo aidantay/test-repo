@@ -1,0 +1,55 @@
+[project]
+site_name = "Test-repo"
+repo_url = "https://github.com/aidantay/test-repo"
+nav = [
+    { "Home" = "index.md" },
+    { "Getting Started" = "getting-started.md" },
+    { "Stages" = [
+        { "Stage 1 - Peptide Window Extraction" = "stages/01-windows.md" },
+    ]},
+    { "API Reference" = [
+      { "Shared Libraries" = "api/shared-libs.md" },
+      { "Stage 1 - Peptide Window Extraction" = "api/01-windows.md" },
+    ]},
+    { "Troubleshooting" = "troubleshooting.md" },
+    { "Developer Notes" = "dev-notes.md" },
+    { "Changelog" = "CHANGELOG.md" },
+]
+
+[project.theme]
+name = "material"
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+primary = "teal"
+accent = "teal"
+scheme = "default"
+[project.theme.palette.toggle]
+icon = "material/brightness-7"
+name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "teal"
+accent = "teal"
+[project.theme.palette.toggle]
+icon = "material/brightness-4"
+name = "Switch to light mode"
+
+[project.plugins.mkdocstrings.handlers.python]
+paths = [
+  "stages/01-windows/src",
+]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+show_source = true
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }
+]

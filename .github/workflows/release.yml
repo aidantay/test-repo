@@ -1,0 +1,52 @@
+name: "Release & Changelog Automation"
+
+on:
+  workflow_run:
+    workflows: 
+      - "Continuous Integration"
+    branches: 
+      - main
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      releases_created: ${{ steps.release-final.outputs.releases_created || steps.release-initial.outputs.releases_created }}
+      tag_name: ${{ steps.release-final.outputs.tag_name || steps.release-initial.outputs.tag_name }}
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: "Create release PR"
+        uses: googleapis/release-please-action@v5
+        id: release-initial
+        with:
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
+          token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: "Auto-merge release PR"
+        if: ${{ steps.release-initial.outputs.pr != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge ${{ fromJSON(steps.release-initial.outputs.pr).number }} --repo ${{ github.repository }} --squash
+
+      - name: "Create release tag"
+        if: ${{ steps.release-initial.outputs.pr != '' }}
+        uses: googleapis/release-please-action@v5
+        id: release-final
+        with:
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
+          token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}

@@ -1,0 +1,6 @@
+[project]
+site_name = "Stage 1 - Peptide Window Extraction"
+nav = [
+    { "Overview" = "index.md" },
+    { "API Reference" = "api.md" }
+]

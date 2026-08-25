@@ -1,0 +1,57 @@
+name: "Publish Container Images to GHCR"
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Release tag name"
+        required: false
+        type: string
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stage:
+          - 01-windows
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: "Determine version"
+        id: version
+        run: |
+          RAW_TAG="${{ inputs.tag || github.ref_name }}"
+          CLEAN_VERSION="${RAW_TAG#v}"
+          echo "VERSION=${CLEAN_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: "Log in to GitHub Container Registry"
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Build stage container image"
+        run: |
+          make build-image \
+            stage=${{ matrix.stage }} \
+            REGISTRY=ghcr.io/${{ github.repository_owner }} \
+            VERSION=${{ steps.version.outputs.VERSION }}
+
+      - name: "Push stage container image"
+        run: |
+          make push-image \
+            stage=${{ matrix.stage }} \
+            REGISTRY=ghcr.io/${{ github.repository_owner }} \
+            VERSION=${{ steps.version.outputs.VERSION }}

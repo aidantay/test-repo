@@ -1,0 +1,15 @@
+[project]
+name = "test-repo"
+version = "0.0.0"
+description = "test-repo"
+requires-python = ">=3.12, <3.14"
+dependencies = [
+    "zensical>=0.0.51",
+    "mkdocstrings[python]>=0.25.0",
+    "shared-libs",
+    "windows",
+]
+
+[tool.uv.sources]
+shared-libs = { path = "commons/shared_libs", editable = true }
+windows = { path = "stages/01-windows" }
